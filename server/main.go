@@ -2,47 +2,31 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+
+	"medium/server/config"
+	"medium/server/handlers"
+	"medium/server/routes"
+	"github.com/joho/godotenv"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello World")
-}
-
-func signup_hanlder(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Signup")
-}
-
-func signin_hanlder(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Signin")
-}
-
-func Post_Blog_Handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Post Blog")
-}
-
-func Put_Blog_Handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Put Blog")
-}
-
-func Get_Blog_Handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Get Blog")
-}
-
 func main() {
-	port := ":8080"
-
-	http.HandleFunc("/signup", signup_hanlder)
-	http.HandleFunc("/signin", signin_hanlder)
-	http.HandleFunc("/api/v1/blog", Post_Blog_Handler)
-	http.HandleFunc("/api/v1/blog", Put_Blog_Handler)
-	http.HandleFunc("/api/v1/blog/:id", Get_Blog_Handler)
-
-	err := http.ListenAndServe(port, nil)
-
+	// Load environment variables
+	err := godotenv.Load()
 	if err != nil {
-		fmt.Println("Error starting server")
-		return
+		log.Println("No .env file found, using environment variables directly")
 	}
 
+	fmt.Printf("hello world\n")
+	db := config.ConnectDatabase()
+	handlers.SetDB(db) // Pass the DB instance to handlers
+
+	// Register routes
+	routes.RegisterRoutes()
+
+	// Start the HTTP server
+	port:=":3000"
+	fmt.Printf("Server running on port %s\n", port)
+	log.Fatal(http.ListenAndServe(port, nil))
 }
