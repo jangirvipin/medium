@@ -20,7 +20,7 @@ func ConnectDatabase() *gorm.DB {
 	}
 
 	// Migrate models
-	err = db.AutoMigrate(&models.User{})
+	err = db.AutoMigrate(&models.User{},&models.Post{})
 	if err != nil {
 		log.Fatal("Failed to migrate models:", err)
 	}
