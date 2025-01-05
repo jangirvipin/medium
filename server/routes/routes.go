@@ -6,6 +6,6 @@ import (
 )
 
 func RegisterRoutes() {
-    http.HandleFunc("/users/create", handlers.CreateUser)
-    http.HandleFunc("/users", handlers.ListUsers)
+    http.HandleFunc("/api/v1/signup", handlers.CreateUser)
+    http.HandleFunc("/api/v1/signin", handlers.ListUsers)
 }
