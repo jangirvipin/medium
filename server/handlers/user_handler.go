@@ -5,7 +5,6 @@ import (
 	"medium/server/models"
 	"net/http"
 	"strings"
-
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -18,10 +17,15 @@ type userBody struct {
 	Password string `json:"password"`
 }
 
+type userLogin struct{
+    Email string `json:"email"`
+    Password string `json:"password"`
+}
 // SetDB assigns the database instance to handlers
 func SetDB(database *gorm.DB) {
 	db = database
 }
+
 
 // CreateUser creates a new user
 func CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -68,14 +72,49 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		"id":    userCreation.ID,
 		"name":  userCreation.Name,
 		"email": userCreation.Email,
-		
+
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(responseUser)
 }
 
-// ListUsers lists all users
-func ListUsers(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("List Users"))
+
+func SigninUser(w http.ResponseWriter, r *http.Request) {
+    if r.Method!="POST"{
+        http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+        return
+    }
+
+    var cred userLogin
+
+    err:=json.NewDecoder(r.Body).Decode(&cred)
+    if err!=nil{
+        http.Error(w, err.Error(), http.StatusBadRequest)
+        return
+    }
+
+    var user models.User
+    res := db.Where("email = ?", cred.Email).First(&user)
+    if res.Error!=nil{
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusNotFound)
+        json.NewEncoder(w).Encode(map[string]string{"msg": "User not found"})
+        return
+    }
+
+    //Unhashing the password
+    err=bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(cred.Password))
+
+    if err!=nil{
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusUnauthorized)
+        json.NewEncoder(w).Encode(map[string]string{"msg": "Invalid password"})
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusOK)
+    json.NewEncoder(w).Encode(map[string]string{"msg": "User signed in successfully"})
 }

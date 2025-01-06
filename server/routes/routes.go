@@ -7,5 +7,5 @@ import (
 
 func RegisterRoutes() {
     http.HandleFunc("/api/v1/signup", handlers.CreateUser)
-    http.HandleFunc("/api/v1/signin", handlers.ListUsers)
+    http.HandleFunc("/api/v1/signin", handlers.SigninUser)
 }
