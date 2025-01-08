@@ -1,11 +1,13 @@
 package routes
 
 import (
-    "net/http"
-    "medium/server/handlers"
+
+	"medium/server/handlers"
+	"net/http"
 )
 
 func RegisterRoutes() {
-    http.HandleFunc("/api/v1/signup", handlers.CreateUser)
-    http.HandleFunc("/api/v1/signin", handlers.SigninUser)
+    http.HandleFunc("/api/user/", handlers.UserHandle)
+    http.HandleFunc("/api/blog/", handlers.BlogHandle)
+	
 }

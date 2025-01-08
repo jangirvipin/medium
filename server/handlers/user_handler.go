@@ -26,6 +26,16 @@ func SetDB(database *gorm.DB) {
 	db = database
 }
 
+func UserHandle(w http.ResponseWriter, r *http.Request) {
+    switch r.URL.Path {
+    case "/api/user/signup":
+        CreateUser(w, r)
+    case "/api/user/signin":
+        SigninUser(w, r)
+    default:
+        http.Error(w, "Not Found", http.StatusNotFound)
+    }
+}
 
 // CreateUser creates a new user
 func CreateUser(w http.ResponseWriter, r *http.Request) {
